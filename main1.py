@@ -1,4 +1,6 @@
 import streamlit as st
+import seaborn as sns
+import matplotlib.pyplot as plt
 st.markdown("""
 
 # Title
@@ -15,3 +17,9 @@ st.markdown("""
 > Amazing Quote
 """)
 st.radio("what kind of data would ypu like to see",['economic date','stock data'])
+
+df=sns.load_dataset("penguins")
+fig, axe = plt.subplots() # creat a new figure, get the axes object
+sns.scatterplot(data=df,x= "flipper_length_mm", y= "bill_length_mm", hue="species", ax = axe)
+st.pyplot(fig)
+
