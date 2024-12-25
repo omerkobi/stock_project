@@ -14,3 +14,4 @@ st.markdown("""
 
 > Amazing Quote
 """)
+st.radio("what kind of data would ypu like to see",['economic date','stock data'])
