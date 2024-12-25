@@ -24,7 +24,7 @@ else:
 
 series = fred_series.json()
 series_dict = series.get('seriess',[])
-tup_lst_id_note = [(dic['id'], dic['notes'].split(".")[0]) for dic in series_dict if 'id' in dic and 'notes' in dic] # list of tuples containing the data id and explanation
+tup_lst_id_note = [(dic['id'],dic['units_short'], dic['notes'].split(".")[0]) for dic in series_dict if 'id' in dic and 'notes' in dic] # list of tuples containing the data id and explanation
 serach_code = 'GDP' # what data i would like to find
 data_codes = [dic['id'] for dic in val if 'notes' in dic and f'{serach_code}' in dic['notes'].split(".")[0]] # list of series code that muches my search_code
 #for i in tup_lst:
