@@ -1,1 +1,2 @@
-print('my project is amazing')
+import streamlit as st
+
