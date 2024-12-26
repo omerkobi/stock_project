@@ -31,7 +31,7 @@ if search_term:
 
     if matching_series:
         # Display matching options
-        option = st.selectbox("Select a matching series:", [f"{id_}: {note}" for id_, note in matching_series])
+        option = st.selectbox("Select the data you want :", [f"{id_}: {note}" for id_, note in matching_series if len(id_) < 15])
 
         if option:
             # Extract the selected series ID
@@ -43,26 +43,41 @@ if search_term:
 
             if df is not None:
                 st.write(f"Data for {selected_id}:")
-                st.dataframe(df)
+                st.dataframe(df[['date', 'value','change_from_last']])
 
                 # Optionally, download as CSV
                 csv = df.to_csv(index=False)
                 st.download_button("Download data as CSV", data=csv, file_name=f"{selected_id}.csv")
                 plot_choice = st.radio("choose what would you like to see",['total value graph', 'presentage change graph'])  # telling the user to pick
                 fig, axe = plt.subplots()  # creat a new figure, get the axes object
+
                 if plot_choice == 'total value graph':
                     sns.lineplot(data=df, x="date", y="value", ax=axe)
                     plt.xticks(ticks=df['date'][::4],rotation=90,fontsize=5)
                     plt.yticks(fontsize=6)
                     st.pyplot(fig)
                     plot_choice2 = st.radio("Any specific value to fetch? "
-                                            "(its better to display the presentage change and not the absolut value) ",['Max value', 'Min value','Average value'])
+                                            "(its better to display the presentage change and not the absolut value) "
+                                            ,['Max value', 'Min value','Average value','median value','pick a specific date'])
                     if plot_choice2 == 'Min value':
                         st.text(df['value'].min())
                     if plot_choice2 == 'Max value':
                         st.text(df['value'].max())
                     if plot_choice2 == 'Average value':
                         st.text(df['value'].mean())
+                    if plot_choice2 == 'median value':
+                        st.text(df['value'].median())
+
+                    if plot_choice2 == 'pick a specific date': # to display a specific date
+                        selected_year = st.selectbox("Select Year:", sorted(df['year'].unique()))
+                        selected_month = st.selectbox("Select Month:", sorted(df['month'].unique()))
+                        specific_date = df[(df['year'] == selected_year) & (df['month'] == selected_month)]
+                        if not specific_date.empty:
+                            st.write("Values for the selected date range:")
+                            st.write(specific_date[['date', 'value']])
+                        else:
+                            st.write("No data available for the selected month and year.")
+
                 if plot_choice == 'presentage change graph':
                     sns.lineplot(data=df, x="date", y='change_from_last', ax=axe)
                     plt.xticks(ticks=df['date'][::4],rotation=90,fontsize=5)
@@ -70,7 +85,7 @@ if search_term:
                     st.pyplot(fig)
                     plot_choice2 = st.radio("Any specific value to fetch? "
                                             "(its better to display the presentage change and not the absolut value) ",
-                                            ['Max value', 'Min value', 'Average value','median value'])
+                                            ['Max value', 'Min value', 'Average value','median value','pick a specific date'])
                     if plot_choice2 == 'Min value':
                         min_val = df['change_from_last'].min()
                         st.text(f'{min_val}%')
@@ -83,5 +98,15 @@ if search_term:
                     if plot_choice2 == 'median value':
                         median_val = df['change_from_last'].median()
                         st.text(f'{median_val}%')
+
+                    if plot_choice2 == 'pick a specific date':
+                        selected_year = st.selectbox("Select Year:", sorted(df['year'].unique()))
+                        selected_month = st.selectbox("Select Month:", sorted(df['month'].unique()))
+                        specific_date = df[(df['year'] == selected_year) & (df['month'] == selected_month)]
+                        if not specific_date.empty:
+                            st.write("Values for the selected date range:")
+                            st.write(specific_date[['date', 'change_from_last']])
+                        else:
+                            st.write("No data available for the selected month and year.")
 
 

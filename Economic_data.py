@@ -11,7 +11,7 @@ data_type = "CPIAUCSL"
 start_data_date = '2000-01-01'
 url = f'https://api.stlouisfed.org/fred/series/observations?series_id={data_type}&api_key={fred_key}&file_type=json&observation_start={start_data_date}'
 ##########
-serach_code = 'PPI' # what data i would like to find
+serach_code = 'nonfarm' # what data i would like to find
 url2 = f'https://api.stlouisfed.org/fred/series/search?search_text={serach_code}&api_key={fred_key}&file_type=json' # in order to find the series id
 fred_series = re.get(url2)
 if fred_series.status_code == 200:
@@ -25,15 +25,20 @@ else:
 
 series = fred_series.json()
 series_dict = series.get('seriess',[])
+full_lst =  [(dic['id'],dic['notes']) for dic in series_dict if 'id' in dic and 'notes' in dic]
 tup_lst_id_note = [(dic['id'],dic['units_short'], dic['notes'].split(".")[0]) for dic in series_dict if 'id' in dic and 'notes' in dic] # list of tuples containing the data id and explanation
 #serach_code = 'GDP' # what data i would like to find
 data_codes = [dic['id'] for dic in series_dict if 'notes' in dic and f'{serach_code}' in dic['notes'].split(".")[0]] # list of series code that muches my search_code
 #print(data_codes)
 #['CPIAUCSL', 'CPILFESL', 'CPILFENS'] - consumers A191RL1Q225SBEA -GDP PAYEMS- nonfarm
+for l in full_lst:
+    if 'PAYEMS' in l:
+        print(l)
+
 for i in tup_lst_id_note:
     for id_ in data_codes:
         if id_ in i:
-            print(i[2])
+            print(i)
 #for i in tup_lst:
     #if 'GEPUCURRENT' in i:
         #print(i)
@@ -70,7 +75,7 @@ def get_matching_series(search_term, api_key):
         series_dict = series.get('seriess', [])
         # Extract (id, notes) for matching series
         matching_series = [(dic['id'], dic['notes'].split(".")[0]) for dic in series_dict if 'id' in dic and 'notes' in dic and
-                           f'{search_term}' in dic['notes'].split(".")[0]]
+                           search_term.lower() in dic['notes'].split(".")[0].lower()]
         return matching_series
     else:
         st.error("Failed to fetch series. Check your API key or network connection.")
@@ -85,13 +90,16 @@ def get_series_data(series_id, start_date, api_key):
         data = response.json()
         observations = data.get('observations', [])
         df = pd.DataFrame(observations)
-        df = df[['date', 'value']]  # Keep only date and value columns
+        #df = df[['date', 'value']]  # Keep only date and value columns
         df['value'] = pd.to_numeric(df['value'], errors='coerce')  # Convert value to numeric
+        df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+        df['month'] = df['date'].dt.month
+        df['year'] = df['date'].dt.year
         df['change_from_last'] = df['value'].pct_change() * 100 # creating a collumn with the presentage change from the last value
         df['change_from_last'] = df['change_from_last'].apply(lambda x: f"{x:.1f}%" if pd.notnull(x) else None)
         df['change_from_last'] = df['change_from_last'].str.rstrip('%').astype(float)  # Convert percentage strings to numeric
         df = df.dropna(subset=['change_from_last'])
-        return df
+        return df #df[['date', 'value','change_from_last']] # returning only the intresting collumn
     else:
         st.error("Failed to fetch data for the selected series.")
         return None
