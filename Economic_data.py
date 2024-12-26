@@ -65,6 +65,7 @@ for i in tup_lst_id_note:
 g = "KJbb(GDP)55"
 print(g.lower())
 
+
 ####################
 def get_matching_series(search_term, api_key):
     url_search = f'https://api.stlouisfed.org/fred/series/search?search_text={search_term}&api_key={api_key}&file_type=json'
@@ -99,7 +100,7 @@ def get_series_data(series_id, start_date, api_key):
         df['change_from_last'] = df['change_from_last'].apply(lambda x: f"{x:.1f}%" if pd.notnull(x) else None)
         df['change_from_last'] = df['change_from_last'].str.rstrip('%').astype(float)  # Convert percentage strings to numeric
         df = df.dropna(subset=['change_from_last'])
-        return df #df[['date', 'value','change_from_last']] # returning only the intresting collumn
+        return df   #df[['date', 'value','change_from_last']] # returning only the intresting collumn
     else:
         st.error("Failed to fetch data for the selected series.")
         return None

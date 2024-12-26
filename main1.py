@@ -3,6 +3,7 @@ import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 import Economic_data as e
+import stock_data as s
 fred_key = '25af470e22d07300c84e19895ed91600'
 
 
@@ -18,9 +19,11 @@ st.markdown("""
 - For better results type letters only 
 
 
-> Amazing Quote
+
 """)
 st.title("search your economic data")
+
+
 # User inputs search term
 search_term = st.text_input("Enter a keyword to search for economic data::(GDP,CPI, nonfarm payrol...)", "")
 
@@ -109,4 +112,9 @@ if search_term:
                         else:
                             st.write("No data available for the selected month and year.")
 
+st.title('Stock data')
+search_stock = st.text_input("Enter the ticker of the stock you are looking for :", "")
+if search_stock:
+    stock_price = s.last_quot_stock_data(search_stock.upper()) #getting the last day closing price
+    
 
