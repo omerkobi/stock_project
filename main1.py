@@ -1,26 +1,49 @@
 import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
+import Economic_data as e
+fred_key = '25af470e22d07300c84e19895ed91600'
+
+
+
+#################### the project :
 st.markdown("""
 
-# Title
+# Economic Data
 
 
+## Here you can extract and download a veriety of economic data 
 
-## Subtitle
-
-- bullet1
-- bullet2
-- bullet3
+- For better results type letters only 
 
 
 > Amazing Quote
 """)
-st.radio("what kind of data would ypu like to see",['economic date','stock data'])
+st.title("search your economic data")
+# User inputs search term
+search_term = st.text_input("Enter a keyword to search for economic data::(GDP,CPI, nonfarm payrol...)", "")
 
-df=sns.load_dataset("penguins")
-plot_choice = st.radio("choose what would you like to see",['economic data','stock data']) # telling the user to pick
-fig, axe = plt.subplots() # creat a new figure, get the axes object
-sns.scatterplot(data=df,x= "flipper_length_mm", y= "bill_length_mm", hue="species", ax = axe)
-st.pyplot(fig)
 
+
+if search_term:
+    matching_series = e.get_matching_series(search_term, fred_key)
+
+    if matching_series:
+        # Display matching options
+        option = st.selectbox("Select a matching series:", [f"{id_}: {note}" for id_, note in matching_series])
+
+        if option:
+            # Extract the selected series ID
+            selected_id = option.split(":")[0]
+
+            # Fetch and display data for the selected series
+            start_data_date = '2000-01-01'
+            df = e.get_series_data(selected_id, start_data_date, fred_key)
+
+            if df is not None:
+                st.write(f"Data for {selected_id}:")
+                st.dataframe(df)
+
+                # Optionally, download as CSV
+                csv = df.to_csv(index=False)
+                st.download_button("Download data as CSV", data=csv, file_name=f"{selected_id}.csv")

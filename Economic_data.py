@@ -11,7 +11,8 @@ data_type = "CPIAUCSL"
 start_data_date = '2000-01-01'
 url = f'https://api.stlouisfed.org/fred/series/observations?series_id={data_type}&api_key={fred_key}&file_type=json&observation_start={start_data_date}'
 ##########
-url2 = f'https://api.stlouisfed.org/fred/series/search?search_text=GDP&api_key={fred_key}&file_type=json' # in order to find the series id
+serach_code = 'GDP' # what data i would like to find
+url2 = f'https://api.stlouisfed.org/fred/series/search?search_text={serach_code}&api_key={fred_key}&file_type=json' # in order to find the series id
 fred_series = re.get(url2)
 if fred_series.status_code == 200:
     # Print the JSON response
@@ -25,14 +26,14 @@ else:
 series = fred_series.json()
 series_dict = series.get('seriess',[])
 tup_lst_id_note = [(dic['id'],dic['units_short'], dic['notes'].split(".")[0]) for dic in series_dict if 'id' in dic and 'notes' in dic] # list of tuples containing the data id and explanation
-serach_code = 'GDP' # what data i would like to find
+#serach_code = 'GDP' # what data i would like to find
 data_codes = [dic['id'] for dic in series_dict if 'notes' in dic and f'{serach_code}' in dic['notes'].split(".")[0]] # list of series code that muches my search_code
 #print(data_codes)
 #['CPIAUCSL', 'CPILFESL', 'CPILFENS'] - consumers A191RL1Q225SBEA -GDP PAYEMS- nonfarm
 for i in tup_lst_id_note:
     for id_ in data_codes:
         if id_ in i:
-            print(i)
+            print(i[2])
 #for i in tup_lst:
     #if 'GEPUCURRENT' in i:
         #print(i)
@@ -47,8 +48,8 @@ if fred.status_code == 200:
     df['date'] = pd.to_datetime(df['date'])
     df['value'] = df['value'].astype(float) # valu is str convert to float in order to calculate the % change
 #print(df.tail(20))
-    df['monthly_change'] = df['value'].pct_change() * 100
-    df['monthly_change'] = df['monthly_change'].apply(lambda x: f"{x:.1f}%" if pd.notnull(x) else "NaN")
+    df['change_from_last'] = df['value'].pct_change() * 100
+    df['change_from_last'] = df['change_from_last'].apply(lambda x: f"{x:.1f}%" if pd.notnull(x) else "NaN")
     df['yearly_change'] = (df['value'] / df['value'].shift(12) - 1) * 100 # calculate the yearly change
     df['yearly_change'] = df['yearly_change'].apply(lambda x: f"{x:.1f}%" if pd.notnull(x) else "NaN")
 #print(df.tail(20))
@@ -56,5 +57,38 @@ else :
     print('error type: ', fred.status_code)
 
 print(df.tail(10))
+g = "KJbb(GDP)55"
+print(g.lower())
 
+####################
+def get_matching_series(search_term, api_key):
+    url_search = f'https://api.stlouisfed.org/fred/series/search?search_text={search_term}&api_key={api_key}&file_type=json'
+    response = re.get(url_search)
 
+    if response.status_code == 200:
+        series = response.json()
+        series_dict = series.get('seriess', [])
+        # Extract (id, notes) for matching series
+        matching_series = [(dic['id'], dic['notes'].split(".")[0]) for dic in series_dict if 'id' in dic and 'notes' in dic]
+        return matching_series
+    else:
+        st.error("Failed to fetch series. Check your API key or network connection.")
+        return []
+
+# Function to fetch data for a specific series ID
+def get_series_data(series_id, start_date, api_key):
+    url_data = f'https://api.stlouisfed.org/fred/series/observations?series_id={series_id}&api_key={api_key}&file_type=json&observation_start={start_date}'
+    response = re.get(url_data)
+
+    if response.status_code == 200:
+        data = response.json()
+        observations = data.get('observations', [])
+        df = pd.DataFrame(observations)
+        df = df[['date', 'value']]  # Keep only date and value columns
+        df['value'] = pd.to_numeric(df['value'], errors='coerce')  # Convert value to numeric
+        df['change_from_last'] = df['value'].pct_change() * 100 # creating a collumn with the presentage change from the last value
+        df['change_from_last'] = df['change_from_last'].apply(lambda x: f"{x:.1f}%" if pd.notnull(x) else "NaN")
+        return df
+    else:
+        st.error("Failed to fetch data for the selected series.")
+        return None
