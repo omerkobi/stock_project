@@ -116,5 +116,16 @@ st.title('Stock data')
 search_stock = st.text_input("Enter the ticker of the stock you are looking for :", "")
 if search_stock:
     stock_price = s.last_quot_stock_data(search_stock.upper()) #getting the last day closing price
-    
+    st.write(stock_price)
+    # for history data
+    historical_data = s.history_stock_data(search_stock)
+    select_year = st.selectbox("select year for the stock data :", [year for year in range(2000,2025)])
+    select_month = st.selectbox("select month for the stock data :", [month for month in range(1, 13)])
+    select_day = st.selectbox("select day for the stock data :", [day for day in range(1, 32)])
+    certain_date = historical_data[(historical_data['year'] == select_year) & (historical_data['month'] == select_month) & (historical_data['day'] == select_day)]
+    if not certain_date.empty :
+        st.dataframe(certain_date[['Date','Open', 'High', 'Low', 'Close', 'Volume']])
+    else:
+        st.write("No data available for the selected date.")
+    #choose_dates =
 
