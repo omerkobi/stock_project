@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import Economic_data as e
 import stock_data as s
-fred_key = '25af470e22d07300c84e19895ed91600'
+fred_key = st.secrets['fred_key']
 
 
 
@@ -56,8 +56,7 @@ if search_term:
                 kind_of_graph = ['total value graph', 'Quarterly percentage change','Yearly percentage change']
                 type_ = ['value','change_from_last','yearly_change']
                 sign =["","%","%"]
-                plot_choice = st.radio("choose what would you like to see",kind_of_graph)
-                #plot_choice = st.radio("choose what would you like to see",['total value graph', 'presentage change graph'])  # telling the user to pick
+                plot_choice = st.radio("choose what would you like to see",kind_of_graph) # telling the user to pick
                 for pick, typ,sig in zip(kind_of_graph,type_,sign): # iterate over the 3 list to display the desiered data
 
                     if plot_choice == pick:
@@ -80,15 +79,15 @@ if search_term:
                             min_index = df[typ].idxmin()
                             min_date = df.at[min_index,'date']
                             st.text(f'the lowest reading is {min_val}{sig} at {min_date}')
-                        if plot_choice2 == 'Max value':
+                        elif plot_choice2 == 'Max value':
                             max_val = df[typ].max()
                             max_index = df[typ].idxmax()
                             max_date = df.at[max_index, 'date']
                             st.text(f'the highest reading is {max_val}{sig} at {max_date}')
-                        if plot_choice2 == 'Average value':
+                        elif plot_choice2 == 'Average value':
                             average_val = round(df[typ].mean(),2)
                             st.text(f'{average_val}{sig}')
-                        if plot_choice2 == 'median value':
+                        elif plot_choice2 == 'median value':
                             median_val = df[typ].median()
                             st.text(f'{median_val}{sig}')
 
@@ -102,7 +101,6 @@ if search_term:
                                 st.write(specific_date[['date', typ]])
                             else:
                                 st.write("No data available for the selected month and year.")
-
 
     else:
         st.write("No data available for your search, try another keyword.")
