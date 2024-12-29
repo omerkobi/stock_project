@@ -46,15 +46,15 @@ if search_term:
 
             if df is not None:
                 st.write(f"Data for {selected_id}:")
-                st.dataframe(df[['date', 'value','change_from_last']])
+                st.dataframe(df[['date', 'value','change_from_last','yearly_change']])
 
                 # Optionally, download as CSV
                 csv = df.to_csv(index=False)
                 st.download_button("Download data as CSV", data=csv, file_name=f"{selected_id}.csv")
 
-                kind_of_graph = ['total value graph', 'presentage change graph']
-                type_ = ['value','change_from_last']
-                sign =["","%"]
+                kind_of_graph = ['total value graph', 'Quarterly percentage change','Yearly percentage change']
+                type_ = ['value','change_from_last','yearly_change']
+                sign =["","%","%"]
                 plot_choice = st.radio("choose what would you like to see",kind_of_graph)
                 #plot_choice = st.radio("choose what would you like to see",['total value graph', 'presentage change graph'])  # telling the user to pick
                 fig, axe = plt.subplots()  # creat a new figure, get the axes object
@@ -70,12 +70,16 @@ if search_term:
                                                 ,['Max value', 'Min value','Average value','median value','pick a specific date'])
                         if plot_choice2 == 'Min value':
                             min_val = df[typ].min()
-                            st.text(f'{min_val}{sig}')
+                            min_index = df[typ].idxmin()
+                            min_date = df.at[min_index,'date']
+                            st.text(f'the lowest reading is {min_val}{sig} at {min_date}')
                         if plot_choice2 == 'Max value':
                             max_val = df[typ].max()
-                            st.text(f'{max_val}{sig}')
+                            max_index = df[typ].idxmax()
+                            max_date = df.at[max_index, 'date']
+                            st.text(f'the highest reading is {max_val}{sig} at {max_date}')
                         if plot_choice2 == 'Average value':
-                            average_val = df[typ].mean()
+                            average_val = round(df[typ].mean(),2)
                             st.text(f'{average_val}{sig}')
                         if plot_choice2 == 'median value':
                             median_val = df[typ].median()
@@ -129,7 +133,8 @@ if search_term:
                           #  st.write(specific_date[['date', 'change_from_last']])
                         #else:
                         #    st.write("No data available for the selected month and year.")
-
+    else:
+        st.write("No data available for your search, try another keyword.")
 st.title('Stock data')
 search_stock = st.text_input("Enter the ticker of the stock you are looking for :", "")
 if search_stock:
