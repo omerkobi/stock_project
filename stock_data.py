@@ -37,12 +37,16 @@ def last_quot_stock_data(ticker):
     #ticker = "AAPL"
 
     # Fetch stock data
-    stock = yf.Ticker(ticker)
+    try:
+        stock = yf.Ticker(ticker)
 
     # Current price
-    current_price = stock.history(period="1d")['Close'].iloc[-1]
-    curr_price = f"Current Price of {ticker}: ${current_price:.2f}"
-    return curr_price
+        current_price = stock.history(period="1d")['Close'].iloc[-1]
+    #curr_price = f"Current Price of {ticker}: ${current_price:.2f}"
+        return current_price
+    except Exception:
+        print(f"Error fetching stock data for {ticker}")
+        return None
 
 def history_stock_data(ticker,start_date="2000-01-01",end_date = "2024-12-01"):
     # Fetch stock data

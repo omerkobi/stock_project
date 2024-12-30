@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import Economic_data as e
 import stock_data as s
+import pandas as pd
 fred_key = st.secrets['fred_key']
 
 
@@ -110,9 +111,16 @@ st.title('Stock data')
 search_stock = st.text_input("Enter the ticker of the stock you are looking for :", "")
 if search_stock:
     stock_price = s.last_quot_stock_data(search_stock.upper()) #getting the last day closing price
-    st.write(stock_price)
+    #try:
+    if stock_price is not None:
+        curr_price = f"Current Price of {search_stock}: ${stock_price:.2f}"
+        st.write(curr_price)
+    else:
+        st.write("no such TICKER exist")
+    #except IndexError :
+     #   st.error(f"No data found for stock: {search_stock.upper()}")
     # for history data
-    historical_data = s.history_stock_data(search_stock)
+    historical_data = s.history_stock_data(search_stock) # getting a data fram with historical stock data
     select_year = st.selectbox("select year for the stock data :", [year for year in range(2000,2025)])
     select_month = st.selectbox("select month for the stock data :", [month for month in range(1, 13)])
     select_day = st.selectbox("select day for the stock data :", [day for day in range(1, 32)])
@@ -122,4 +130,18 @@ if search_stock:
     else:
         st.write("No data available for the selected date.")
     #choose_dates =
-
+    correl= st.radio("would you like to check for correlation to other tickers?", ['Yes','No'])
+    if correl == 'Yes':
+        search_stock2 = st.text_input("Enter the ticker of the stock you would like to check correlation  :", "")
+        if search_stock2:
+            hist_for_corr = s.history_stock_data(search_stock2.upper())
+            corelation = historical_data['Close'].corr(hist_for_corr['Close'])
+            st.write(f"the correlation is : {corelation}")
+            combined_df = pd.concat([historical_data[['Open','High', 'Low', 'Close']], hist_for_corr[['Open','High', 'Low', 'Close']]], axis=1)
+            combined_df.columns = [f'Open{search_stock}', f'High{search_stock}', f'Low{search_stock}', f'Close{search_stock}', f'Open{search_stock2}', f'High{search_stock2}', f'Low{search_stock2}', f'Close{search_stock2}']
+            correlation_matrix = combined_df.corr()
+            plt.figure(figsize=(10, 8))  # Optional: Adjust figure size
+            heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+            st.pyplot(plt)
+else:
+    st.write("such TICKER does not exist, the ticker needs to be 2-4 english letters. for example you can try : AAPL,MSFT,WFC,TSLA")
