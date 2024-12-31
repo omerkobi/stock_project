@@ -137,7 +137,7 @@ if search_stock:
             corelation = historical_data['Close'].corr(hist_for_corr['Close'])
             st.write(f"the correlation is : {corelation}")
             combined_df = pd.concat([historical_data[['Open','High', 'Low', 'Close']], hist_for_corr[['Open','High', 'Low', 'Close']]], axis=1)
-            combined_df.columns = [f'Open{search_stock}', f'High{search_stock}', f'Low{search_stock}', f'Close{search_stock}', f'Open{search_stock2}', f'High{search_stock2}', f'Low{search_stock2}', f'Close{search_stock2}']
+            combined_df.columns = [f'Open-{search_stock.upper()}', f'High-{search_stock.upper()}', f'Low-{search_stock.upper()}', f'Close-{search_stock.upper()}', f'Open-{search_stock2.upper()}', f'High-{search_stock2.upper()}', f'Low-{search_stock2.upper()}', f'Close-{search_stock2.upper()}']
             correlation_matrix = combined_df.corr()
             plt.figure(figsize=(10, 8))  # Optional: Adjust figure size
             heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
