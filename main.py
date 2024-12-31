@@ -19,6 +19,7 @@ st.markdown("""
 ## Here you can extract and download a veriety of economic data 
 
 - For better results type letters only 
+- English letters only 
 
 
 
@@ -36,7 +37,7 @@ if search_term:
 
     if matching_series:
         # Display matching options
-        option = st.selectbox("Select the data you want :", [f"{id_}: {note}" for id_, note in matching_series if len(id_) < 15])
+        option = st.selectbox("Select the data you want from the list:", [f"{id_}: {note}" for id_, note in matching_series if len(id_) < 15])
 
         if option:
             # Extract the selected series ID
@@ -57,7 +58,7 @@ if search_term:
                 kind_of_graph = ['total value graph', 'Quarterly percentage change','Yearly percentage change']
                 type_ = ['value','change_from_last','yearly_change']
                 sign =["","%","%"]
-                plot_choice = st.radio("choose what would you like to see",kind_of_graph) # telling the user to pick
+                plot_choice = st.radio("choose what would you like to see (its better to display the presentage change and not the absolut value)",kind_of_graph) # telling the user to pick
                 for pick, typ,sig in zip(kind_of_graph,type_,sign): # iterate over the 3 list to display the desiered data
 
                     if plot_choice == pick:
@@ -73,7 +74,6 @@ if search_term:
                             st.plotly_chart(fig)
 
                         plot_choice2 = st.radio("Any specific value to fetch? "
-                                                "(its better to display the presentage change and not the absolut value) "
                                                 ,['Max value', 'Min value','Average value','median value','pick a specific date'])
                         if plot_choice2 == 'Min value':
                             min_val = df[typ].min()
@@ -134,13 +134,16 @@ if search_stock:
         search_stock2 = st.text_input("Enter the ticker of the stock you would like to check correlation  :", "")
         if search_stock2:
             hist_for_corr = s.history_stock_data(search_stock2.upper())
-            corelation = historical_data['Close'].corr(hist_for_corr['Close'])
-            st.write(f"the correlation is : {corelation}")
-            combined_df = pd.concat([historical_data[['Open','High', 'Low', 'Close']], hist_for_corr[['Open','High', 'Low', 'Close']]], axis=1)
-            combined_df.columns = [f'Open-{search_stock.upper()}', f'High-{search_stock.upper()}', f'Low-{search_stock.upper()}', f'Close-{search_stock.upper()}', f'Open-{search_stock2.upper()}', f'High-{search_stock2.upper()}', f'Low-{search_stock2.upper()}', f'Close-{search_stock2.upper()}']
-            correlation_matrix = combined_df.corr()
-            plt.figure(figsize=(10, 8))  # Optional: Adjust figure size
-            heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
-            st.pyplot(plt)
+            if not isinstance(hist_for_corr, str):
+                corelation = historical_data['Close'].corr(hist_for_corr['Close'])
+                st.write(f"the correlation is : {corelation}")
+                combined_df = pd.concat([historical_data[['Open','High', 'Low', 'Close']], hist_for_corr[['Open','High', 'Low', 'Close']]], axis=1)
+                combined_df.columns = [f'Open-{search_stock.upper()}', f'High-{search_stock.upper()}', f'Low-{search_stock.upper()}', f'Close-{search_stock.upper()}', f'Open-{search_stock2.upper()}', f'High-{search_stock2.upper()}', f'Low-{search_stock2.upper()}', f'Close-{search_stock2.upper()}']
+                correlation_matrix = combined_df.corr()
+                plt.figure(figsize=(10, 8))  # Optional: Adjust figure size
+                heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+                st.pyplot(plt)
+            else:
+                st.write("Not a valid Ticker please type another ")
 else:
-    st.write("such TICKER does not exist, the ticker needs to be 2-4 english letters. for example you can try : AAPL,MSFT,WFC,TSLA")
+    st.write("Such Ticker does not exist, the ticker needs to be 2-4 english letters. for example you can try : AAPL,MSFT,WFC,TSLA")

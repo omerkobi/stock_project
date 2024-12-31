@@ -61,9 +61,12 @@ def history_stock_data(ticker,start_date="2000-01-01",end_date = "2024-12-01"):
     historical_data['month'] = historical_data['Date'].dt.month
     historical_data['day'] = historical_data['Date'].dt.day
 
-
+    if historical_data.empty:
+        return "Not a valid ticker"
     # Display historical data
-    return historical_data
+    else:
+        return historical_data
+
     #print(historical_data)
     #print(type(historical_data))
     #print(historical_data.columns)
@@ -84,4 +87,4 @@ historical_data = stock.history(start=start_date, end=end_date)
 historical_data = historical_data.reset_index()
 
 # Display historical data
-print(historical_data.columns)
+print(historical_data.dtypes)
