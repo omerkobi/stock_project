@@ -42,7 +42,6 @@ def last_quot_stock_data(ticker):
 
     # Current price
         current_price = stock.history(period="1d")['Close'].iloc[-1]
-    #curr_price = f"Current Price of {ticker}: ${current_price:.2f}"
         return current_price
     except Exception:
         print(f"Error fetching stock data for {ticker}")

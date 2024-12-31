@@ -117,8 +117,7 @@ if search_stock:
         st.write(curr_price)
     else:
         st.write("no such TICKER exist")
-    #except IndexError :
-     #   st.error(f"No data found for stock: {search_stock.upper()}")
+
     # for history data
     historical_data = s.history_stock_data(search_stock) # getting a data fram with historical stock data
     select_year = st.selectbox("select year for the stock data :", [year for year in range(2000,2025)])
