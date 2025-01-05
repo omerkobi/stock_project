@@ -115,35 +115,37 @@ if search_stock:
     if stock_price is not None:
         curr_price = f"Current Price of {search_stock}: ${stock_price:.2f}"
         st.write(curr_price)
-    else:
-        st.write("no such TICKER exist")
+
 
     # for history data
-    historical_data = s.history_stock_data(search_stock) # getting a data fram with historical stock data
-    select_year = st.selectbox("select year for the stock data :", [year for year in range(2000,2025)])
-    select_month = st.selectbox("select month for the stock data :", [month for month in range(1, 13)])
-    select_day = st.selectbox("select day for the stock data :", [day for day in range(1, 32)])
-    certain_date = historical_data[(historical_data['year'] == select_year) & (historical_data['month'] == select_month) & (historical_data['day'] == select_day)]
-    if not certain_date.empty :
-        st.dataframe(certain_date[['Date','Open', 'High', 'Low', 'Close', 'Volume']])
-    else:
-        st.write("No data available for the selected date.")
-    #choose_dates =
-    correl= st.radio("would you like to check for correlation to other tickers?", ['Yes','No'])
-    if correl == 'Yes':
-        search_stock2 = st.text_input("Enter the ticker of the stock you would like to check correlation  :", "")
-        if search_stock2:
-            hist_for_corr = s.history_stock_data(search_stock2.upper())
-            if not isinstance(hist_for_corr, str):
-                corelation = historical_data['Close'].corr(hist_for_corr['Close'])
-                st.write(f"the correlation is : {corelation}")
-                combined_df = pd.concat([historical_data[['Open','High', 'Low', 'Close']], hist_for_corr[['Open','High', 'Low', 'Close']]], axis=1)
-                combined_df.columns = [f'Open-{search_stock.upper()}', f'High-{search_stock.upper()}', f'Low-{search_stock.upper()}', f'Close-{search_stock.upper()}', f'Open-{search_stock2.upper()}', f'High-{search_stock2.upper()}', f'Low-{search_stock2.upper()}', f'Close-{search_stock2.upper()}']
-                correlation_matrix = combined_df.corr()
-                plt.figure(figsize=(10, 8))  # Optional: Adjust figure size
-                heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
-                st.pyplot(plt)
-            else:
-                st.write("Not a valid Ticker please type another ")
+        historical_data = s.history_stock_data(search_stock) # getting a data fram with historical stock data
+        select_year = st.selectbox("select year for the stock data :", [year for year in range(2000,2025)])
+        select_month = st.selectbox("select month for the stock data :", [month for month in range(1, 13)])
+        select_day = st.selectbox("select day for the stock data :", [day for day in range(1, 32)])
+    #if not isinstance(historical_data, str):
+        certain_date = historical_data[(historical_data['year'] == select_year) & (historical_data['month'] == select_month) & (historical_data['day'] == select_day)]
+        if not certain_date.empty :
+            st.dataframe(certain_date[['Date','Open', 'High', 'Low', 'Close', 'Volume']])
+        else:
+            st.write("No data available for the selected date.")
+
+        correl= st.radio("would you like to check for correlation to other tickers?", ['Yes','No'])
+        if correl == 'Yes':
+            search_stock2 = st.text_input("Enter the ticker of the stock you would like to check correlation  :", "")
+            if search_stock2:
+                hist_for_corr = s.history_stock_data(search_stock2.upper())
+                if not isinstance(hist_for_corr, str):
+                    corelation = historical_data['Close'].corr(hist_for_corr['Close'])
+                    st.write(f"the correlation is : {corelation}")
+                    combined_df = pd.concat([historical_data[['Open','High', 'Low', 'Close']], hist_for_corr[['Open','High', 'Low', 'Close']]], axis=1)
+                    combined_df.columns = [f'Open-{search_stock.upper()}', f'High-{search_stock.upper()}', f'Low-{search_stock.upper()}', f'Close-{search_stock.upper()}', f'Open-{search_stock2.upper()}', f'High-{search_stock2.upper()}', f'Low-{search_stock2.upper()}', f'Close-{search_stock2.upper()}']
+                    correlation_matrix = combined_df.corr()
+                    plt.figure(figsize=(10, 8))  # Optional: Adjust figure size
+                    heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+                    st.pyplot(plt)
+                else:
+                    st.write("Not a valid Ticker please type another ")
+    else:  # if the ticker is not valid
+        st.write("no such TICKER exist- type another")
 else:
     st.write("Such Ticker does not exist, the ticker needs to be 2-4 english letters. for example you can try : AAPL,MSFT,WFC,TSLA")
