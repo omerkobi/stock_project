@@ -88,4 +88,4 @@ def history_stock_data(ticker,start_date="2000-01-01",end_date = "2024-12-01"):
 #historical_data = historical_data.reset_index()
 
 # Display historical data
-print(historical_data.dtypes)
+#print(historical_data.dtypes)
