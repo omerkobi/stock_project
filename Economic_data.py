@@ -4,10 +4,6 @@ import json
 
 
 
-
-
-
-
 ####################
 def get_matching_series(search_term, api_key):
     url_search = f'https://api.stlouisfed.org/fred/series/search?search_text={search_term}&api_key={api_key}&file_type=json'
