@@ -33,16 +33,18 @@ data on the stock.
 
 Instructions:
 Type the code of the economic data you want (cpi, ppi, Nonfarm payroll) 
-or type keywords that relate to the data.
+or type keywords that relate to the data 
+( you can type in upper case or lower case it doesn't matter)
 A dataframe with the relevant data will be shown- you can also download the data
 to your computer. 
 You can choose specific value to fetch, display the data 
 on 2 types of graph - just pick the one you want.
+
 For the stock data part you need to type the ticker of the stock you want 
 in order to see the last closing price, you can pick a date to see data 
-on the stock on that specific day. 
+on the stock on that specific day.
 In the bottom part of the screen you can check for correlation
 to other traded stock and the program will provide a heat map
-compering the relative data.
+comparing the relative data.
 
 
